@@ -1,0 +1,111 @@
+{
+  "sunburst2_deluxe_ecu_25": {
+    "information": {
+      "authors": "Kristof",
+      "name": "Deluxe ECU (Sunburst2 2.5L F4 - Lua)",
+      "value": 800
+    },
+
+    "slotType": "sunburst2_engine_2_5_ecu",
+
+    "variables": [
+      ["name", "type", "unit", "category", "default", "min", "max", "title", "description"],
+
+      ["$dd_revLimiterRPM", "range", "rpm", "Deluxe ECU",
+        7000, 4000, 9000,
+        "Rev Limit", "RPM where the rev limiter cuts"],
+
+      ["$dd_cutTime", "range", "s", "Deluxe ECU",
+        0.12, 0.02, 0.40,
+        "Limiter Cut Time", "How fast the limiter cycles"],
+
+      ["$dd_idleRPM", "range", "rpm", "Deluxe ECU",
+        950, 600, 2000,
+        "Idle RPM", "Engine idle speed"],
+
+      ["$dd_powerCoef", "range", "", "Deluxe ECU",
+        1.0, 0.2, 5.0,
+        "Power Multiplier", "Scales the engine power"],
+
+      ["$dd_indestructible", "bool", "", "Deluxe ECU",
+        false, false, true,
+        "Indestructible Engine", "Makes the engine immune to all damage"],
+
+      ["$dd_engineBrakeTorque", "range", "Nm", "Deluxe ECU",
+        60, 10, 200,
+        "Engine Brake Torque", "Engine braking force when decelerating"],
+
+      ["$dd_highShiftUp", "range", "rpm", "Deluxe ECU",
+        6800, 4500, 8900,
+        "High Shift Up", "Auto upshift RPM at high throttle"],
+
+      ["$dd_highShiftDown", "range", "rpm", "Deluxe ECU",
+        4200, 2500, 7000,
+        "High Shift Down", "Auto downshift RPM at high throttle"],
+
+      ["$dd_cylinderWallThreshold", "range", "", "Engine Durability",
+        1000000000, 100000000, 1000000000,
+        "Cylinder Wall Threshold", "Damage threshold for cylinder walls"],
+
+      ["$dd_headGasketThreshold", "range", "", "Engine Durability",
+        1000000000, 100000000, 1000000000,
+        "Head Gasket Threshold", "Damage threshold for head gasket"],
+
+      ["$dd_pistonRingThreshold", "range", "", "Engine Durability",
+        1000000000, 100000000, 1000000000,
+        "Piston Ring Threshold", "Damage threshold for piston rings"],
+
+      ["$dd_connectingRodThreshold", "range", "", "Engine Durability",
+        1000000000, 100000000, 1000000000,
+        "Connecting Rod Threshold", "Damage threshold for connecting rods"],
+
+      ["$dd_maxTorqueRating", "range", "", "Engine Durability",
+        1000000000, 100000000, 1000000000,
+        "Max Torque Rating", "Maximum torque before damage"],
+
+      ["$dd_maxOverTorqueDamage", "range", "", "Engine Durability",
+        1000000000, 100000000, 1000000000,
+        "Over Torque Damage", "Damage from exceeding torque rating"]
+    ],
+
+    "controller": [
+  ["fileName"],
+  ["sunburst2_deluxe_ecu", { 
+    "powerCoef": "$dd_powerCoef",
+    "indestructible": "$dd_indestructible",
+    "engineBrakeTorque": "$dd_engineBrakeTorque",
+    "cylinderWallDamageThreshold": "$dd_cylinderWallThreshold",
+    "headGasketDamageThreshold": "$dd_headGasketThreshold",
+    "pistonRingDamageThreshold": "$dd_pistonRingThreshold",
+    "connectingRodDamageThreshold": "$dd_connectingRodThreshold",
+    "maxTorqueRating": "$dd_maxTorqueRating",
+    "maxOverTorqueDamage": "$dd_maxOverTorqueDamage"
+  }]
+]
+
+
+    "mainEngine": {
+      "hasRevLimiter": true,
+      "revLimiterType": "timeBased",
+      "revLimiterRPM": "$dd_revLimiterRPM",
+      "revLimiterCutTime": "$dd_cutTime",
+
+      "idleRPM": "$dd_idleRPM",
+
+      "maxRPM": 9500,
+
+      "inertia": 0.16,
+      "engineBrakeTorque": 60,
+
+      "thermalsEnabled": false,
+
+      "cylinderWallTemperatureDamageThreshold": 1000000000,
+      "headGasketDamageThreshold":            1000000000,
+      "pistonRingDamageThreshold":            1000000000,
+      "connectingRodDamageThreshold":         1000000000,
+
+      "maxTorqueRating":     1000000000,
+      "maxOverTorqueDamage": 1000000000
+    }
+  }
+}
