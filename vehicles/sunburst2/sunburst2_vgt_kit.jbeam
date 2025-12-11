@@ -1,0 +1,43 @@
+{
+  "sunburst2_vgt_kit": {
+    "information": {
+      "authors": "Kristof",
+      "name": "Variable Geometry Turbo Kit",
+      "value": 2500
+    },
+
+    "slotType": "sunburst2_vgt_kit",
+
+    "variables": [
+      ["name", "type", "unit", "category", "default", "min", "max", "title", "description"],
+      ["$vgt_enabled", "bool", "", "VGT", true, false, true, "Enable VGT", "Enable the Variable Geometry Turbo Kit"],
+      ["$vgt_lowBoost", "range", "x", "VGT", 1.25, 1.0, 2.5, "Low-end Boost Multiplier", "Torque multiplier applied at low RPM (simulates tighter vane geometry)"],
+      ["$vgt_highBoost", "range", "x", "VGT", 1.00, 0.5, 2.5, "High-end Boost Multiplier", "Torque multiplier applied at high RPM (open vanes)"] ,
+      ["$vgt_transitionRPM", "range", "rpm", "VGT", 3000, 1000, 8000, "Transition RPM", "RPM where vanes move from low to high setting"],
+      ["$vgt_spoolTime", "range", "s", "VGT", 0.25, 0.01, 2.0, "Spool Time Constant", "How quickly vane geometry and effective boost move (s)"] ,
+      ["$vgt_exposeToGauges", "bool", "", "VGT", true, false, true, "Expose to Gauges", "Expose current boost multiplier to gauges/electrics if supported"],
+      ["$vgt_peakBoost", "range", "x", "VGT", 1.08, 1.0, 1.5, "Transient Peak Multiplier", "Small transient peak around peak RPM (multiplier, e.g. 1.08 = +8%)"],
+      ["$vgt_peakRPM", "range", "rpm", "VGT", 2000, 800, 6000, "Peak RPM", "RPM where transient peak occurs"],
+      ["$vgt_peakWidth", "range", "rpm", "VGT", 800, 100, 3000, "Peak Width", "Gaussian width (sigma) for transient peak in RPM"],
+      ["$vgt_soundEvent", "string", "", "VGT", "", "", "", "Turbo Sound Event", "Optional sound event name to modulate with boost"],
+      ["$vgt_visualNode", "string", "", "VGT", "", "", "", "Vane Visual Node", "Optional visual node/material param that can be driven by vane position"]
+    ],
+
+    "controller": [
+      ["fileName"],
+      ["sunburst2_vgt_controller", { 
+        "enabled": "$vgt_enabled",
+        "lowBoost": "$vgt_lowBoost",
+        "highBoost": "$vgt_highBoost",
+        "transitionRPM": "$vgt_transitionRPM",
+        "spoolTime": "$vgt_spoolTime",
+        "exposeToGauges": "$vgt_exposeToGauges",
+        "soundEvent": "$vgt_soundEvent",
+        "visualNode": "$vgt_visualNode",
+        "peakBoost": "$vgt_peakBoost",
+        "peakRPM": "$vgt_peakRPM",
+        "peakWidth": "$vgt_peakWidth"
+      }]
+    ]
+  }
+}
