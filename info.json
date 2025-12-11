@@ -1,0 +1,6 @@
+{
+  "name": "Sunburst2 Deluxe ECU (Lua Power)",
+  "version": "1.0",
+  "author": "Kristof",
+  "description": "Deluxe ECU for Sunburst2 2.5L F4 with Lua-based power multiplier, high rev limit and near-indestructible engine."
+}
