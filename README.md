@@ -26,3 +26,6 @@ Exposes VGT data (boost, vane position, sound level) to electrics for custom gau
 Close lower gears for acceleration, long upper gears for top speed/cruise
 
 Beefed-up torque capacity to survive high power + crazy power multiplier setups
+
+
+PS. yes I know I could have made all in jbeam, shush
