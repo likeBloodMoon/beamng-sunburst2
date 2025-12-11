@@ -1,0 +1,47 @@
+{
+  "sunburst2_15_speed_transmission": {
+    "information": {
+      "authors": "Kristof",
+      "name": "15-Speed Manual Transmission (Sunburst2)",
+      "value": 1200
+    },
+
+    "slotType": "sunburst2_transmission",
+
+    "gearbox": {
+      "type": "manual",
+
+      "gears": [
+        3.8,
+        2.85,
+        2.2,
+        1.75,
+        1.4,
+        1.15,
+        0.95,
+        0.8,
+        0.68,
+        0.58,
+        0.5,
+        0.43,
+        0.37,
+        0.32,
+        0.28
+      ],
+
+      "reverse": -3.8,
+      "neutral": 0,
+
+      "finalDriveRatio": 3.7,
+
+      "shiftTime": 0.35,
+      "clutchTime": 0.1,
+      
+      "lockupTorque": 600000,
+      "maxTorque": 800000,
+
+      "friction": 0.02,
+      "viscousFriction": 0.08
+    }
+  }
+}
