@@ -1,0 +1,35 @@
+{
+  "sunburst2_6_speed_sequential_transmission": {
+    "information": {
+      "authors": "Kristof",
+      "name": "6-Speed Sequential Transmission (Sunburst2)",
+      "value": 1800
+    },
+
+    "slotType": "sunburst2_transmission",
+
+    "gearbox": {
+      "type": "sequential",
+      "gears": [3.10, 2.05, 1.55, 1.21, 0.98, 0.82],
+      "reverse": -2.90,
+      "neutral": 0,
+      "finalDriveRatio": 3.9,
+      "shiftTime": 0.18,
+      "clutchTime": 0.06,
+      "lockupTorque": 450000,
+      "maxTorque": 650000,
+      "friction": 0.018,
+      "viscousFriction": 0.065
+    },
+
+    "vehicleController": {
+      "automaticModes": ["S"],
+      "gearboxBehavior": "sequentialGearbox",
+      "calculateOptimalLoadShiftPoints": true,
+      "lowShiftDownRPM": [0, 0, 0, 1700, 1700, 1700, 1700],
+      "highShiftUpRPM": [0, 0, 6500, 6500, 6500, 6500, 6500],
+      "clutchLaunchStartRPM": 2200,
+      "clutchLaunchTargetRPM": 2800
+    }
+  }
+}

@@ -25,7 +25,7 @@
 
     "controller": [
       ["fileName"],
-      ["sunburst2_vgt_controller", { 
+      ["sunburst2_vgt_controller", {
         "enabled": "$vgt_enabled",
         "lowBoost": "$vgt_lowBoost",
         "highBoost": "$vgt_highBoost",
@@ -37,7 +37,8 @@
         "peakBoost": "$vgt_peakBoost",
         "peakRPM": "$vgt_peakRPM",
         "peakWidth": "$vgt_peakWidth"
-      }]
+      }],
+      ["sunburst2_vgt_gauge"]
     ]
   }
 }

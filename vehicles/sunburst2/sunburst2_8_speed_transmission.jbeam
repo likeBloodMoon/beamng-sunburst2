@@ -1,0 +1,35 @@
+{
+  "sunburst2_8_speed_transmission": {
+    "information": {
+      "authors": "Kristof",
+      "name": "8-Speed Automatic Transmission (Sunburst2)",
+      "value": 2200
+    },
+
+    "slotType": "sunburst2_transmission",
+
+    "gearbox": {
+      "type": "automatic",
+      "gears": [4.71, 3.14, 2.11, 1.67, 1.28, 1.00, 0.82, 0.64],
+      "reverse": -3.29,
+      "neutral": 0,
+      "finalDriveRatio": 3.27,
+      "shiftTime": 0.22,
+      "clutchTime": 0.08,
+      "lockupTorque": 480000,
+      "maxTorque": 720000,
+      "friction": 0.02,
+      "viscousFriction": 0.07
+    },
+
+    "vehicleController": {
+      "automaticModes": ["D", "S"],
+      "calculateOptimalLoadShiftPoints": true,
+      "lowShiftDownRPM": [0, 0, 1400, 1400, 1500, 1600, 1700, 1800, 1900],
+      "highShiftUpRPM": [0, 0, 6200, 6200, 6200, 6100, 6000, 5900, 5800],
+      "sportModeGearboxResponse": 1.1,
+      "clutchLaunchStartRPM": 1700,
+      "clutchLaunchTargetRPM": 2100
+    }
+  }
+}
