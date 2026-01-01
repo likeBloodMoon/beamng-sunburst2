@@ -2,6 +2,7 @@ local M = {}
 
 local engine
 local electrics
+local loggedElectricsFailure = false
 
 local function safeElectricsSet(name, value)
   if not name then return end
@@ -22,12 +23,18 @@ end
 
 local function init()
   engine = powertrain.getDevice("mainEngine") or powertrain.getDevice("engine")
+
   -- attempt to find electrics API
-  electrics = electrics or electrics -- try global
+  if not electrics then electrics = rawget(_G or {}, "electrics") end
   -- some vehicle setups provide an `electrics` module
   if not electrics and type(require) == "function" then
     local ok, mod = pcall(require, "electrics")
     if ok and type(mod) == "table" then electrics = mod end
+  end
+
+  if not electrics and not loggedElectricsFailure then
+    log("W", "sunburst2_vgt_gauge", "Could not bind to electrics; VGT gauges will not update")
+    loggedElectricsFailure = true
   end
 end
 

@@ -1,0 +1,97 @@
+{
+  "sunburst2_engine_6_2_v8": {
+    "information": {
+      "authors": "Kristof",
+      "name": "6.2L V8 (Sunburst2)",
+      "value": 7200,
+      "description": "6.2L longitudinal V8 inspired by Tonawanda/St. Catharines builds. 420 hp @ 5600 rpm and 460 lb-ft @ 4100 rpm with classic OHV character."
+    },
+
+    "slotType": "sunburst2_engine",
+
+    "slots": [
+      ["type", "default", "description"],
+      ["sunburst2_engine_ecu", "sunburst2_deluxe_ecu_25", "ECU"],
+      ["sunburst2_transmission", "sunburst2_8_speed_transmission", "Transmission"],
+      ["sunburst2_engine_intake", "", "Intake"],
+      ["sunburst2_exhaust", "", "Exhaust"],
+      ["sunburst2_engine_accessory", "", "Accessories"]
+    ],
+
+    "powertrain": [
+      ["type", "name", "inputName", "inputIndex"],
+      ["combustionEngine", "mainEngine", "clutch", 1]
+    ],
+
+    "engine": {
+      "engineType": "V8",
+      "cylinders": 8,
+      "firingOrder": "1-8-7-2-6-5-4-3",
+      "valvetrain": "OHV",
+      "displacement": 6.162,
+      "compressionRatio": 11.5,
+      "longitudinal": true,
+
+      "idleRPM": 700,
+      "stallRPM": 500,
+      "maxRPM": 6000,
+      "revLimiterRPM": 6000,
+      "revLimiterType": "fuelCutSoft",
+      "inertia": 0.29,
+      "friction": 16,
+      "dynamicFriction": 0.019,
+      "burnEfficiency": 0.36,
+      "torqueLossCoef": 0.38,
+      "throttleSensitivity": 1.1,
+      "engineBrakeTorque": 40,
+      "engineBrakeDuration": 0.12,
+      "starterTorque": 140,
+      "fuelType": "gasoline",
+      "thermalsEnabled": true,
+      "coolingEfficiency": 55,
+      "oilThermalsEnabled": true,
+      "oilVolume": 6.7,
+      "waterVolume": 8.5,
+
+      "exhaust": [
+        ["name", "volume", "pitch", "note"],
+        ["engine", 0.9, 0.5, 0.75]
+      ],
+
+      "torque": [
+        ["rpm", "torque"],
+        [0, 0],
+        [800, 430],
+        [1500, 520],
+        [2500, 585],
+        [3200, 610],
+        [4100, 624],
+        [4800, 600],
+        [5600, 534],
+        [6000, 480]
+      ],
+
+      "power": [
+        ["rpm", "power"],
+        [5600, 420]
+      ],
+
+      "damageThresholdTemperature": 130,
+      "cylinderWallTemperatureDamageThreshold": 170,
+      "headGasketDamageThreshold": 170,
+      "pistonRingDamageThreshold": 170,
+      "connectingRodDamageThreshold": 750000,
+      "frictionCoef": 0.02,
+      "dynamicFrictionCoef": 0.018
+    },
+
+    "blockMaterial": "cast aluminum",
+    "headMaterial": "cast aluminum",
+    "intakeManifold": "composite",
+    "exhaustManifold": "cast nodular iron",
+    "crankshaft": "forged steel",
+    "camshaft": "billet steel",
+    "connectingRods": "forged powder metal",
+    "emissions": "3-way catalyst + PCV"
+  }
+}

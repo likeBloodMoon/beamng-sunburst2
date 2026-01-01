@@ -28,7 +28,11 @@ local function copyCurve(curve)
   if type(curve) ~= "table" then return nil end
   local newCurve = {}
   for i, v in ipairs(curve) do
-    newCurve[i] = v
+    if type(v) == "table" then
+      newCurve[i] = { v[1], v[2] }
+    else
+      newCurve[i] = v
+    end
   end
   return newCurve
 end
@@ -45,7 +49,6 @@ local function applyVGTMultiplier(mult)
     end
   end
 
-  engine.torque = newCurve
   engine.torqueCurve = newCurve
 end
 
@@ -61,6 +64,12 @@ local function init(jbeamData)
     baseTorqueCurve = copyCurve(engine.torque)
   elseif type(engine.torqueCurve) == "table" then
     baseTorqueCurve = copyCurve(engine.torqueCurve)
+  end
+
+  if not baseTorqueCurve then
+    log("E", "sunburst2_vgt_controller", "No usable torque curve on engine; VGT will be disabled")
+    config.enabled = false
+    return
   end
 
   if jbeamData then

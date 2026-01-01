@@ -2,7 +2,7 @@ local M = {}
 
 local engine
 local baseTorqueCurve
-local config = { 
+local config = {
   powerCoef = 1,
   indestructible = false,
   engineBrakeTorque = 60,
@@ -11,7 +11,12 @@ local config = {
   pistonRingDamageThreshold = 1000000000,
   connectingRodDamageThreshold = 1000000000,
   maxTorqueRating = 1000000000,
-  maxOverTorqueDamage = 1000000000
+  maxOverTorqueDamage = 1000000000,
+  revLimiterRPM = 7000,
+  revLimiterCutTime = 0.12,
+  idleRPM = 950,
+  highShiftUp = 6800,
+  highShiftDown = 4200
 }
 
 local function clamp(x, minV, maxV)
@@ -22,9 +27,14 @@ end
 
 local function copyCurve(curve)
   if type(curve) ~= "table" then return nil end
+
   local newCurve = {}
   for i, v in ipairs(curve) do
-    newCurve[i] = v -- v is just a number (torque at that RPM index)
+    if type(v) == "table" then
+      newCurve[i] = { v[1], v[2] }
+    else
+      newCurve[i] = v -- v is just a number (torque at that RPM index)
+    end
   end
   return newCurve
 end
@@ -37,7 +47,11 @@ local function applyPowerCoef()
 
   local newCurve = {}
   for i, v in ipairs(baseTorqueCurve) do
-    newCurve[i] = v * scale
+    if type(v) == "table" and #v >= 2 then
+      newCurve[i] = { v[1], v[2] * scale }
+    else
+      newCurve[i] = (tonumber(v) or 0) * scale
+    end
   end
 
   engine.torqueCurve = newCurve
@@ -67,6 +81,16 @@ local function applyEngineConfig()
 
   damageThreshold = config.indestructible and 1000000000 or tonumber(config.maxOverTorqueDamage) or 1000000000
   engine.maxOverTorqueDamage = damageThreshold
+
+  -- Rev limiter and idle settings
+  engine.hasRevLimiter = true
+  engine.revLimiterRPM = tonumber(config.revLimiterRPM) or engine.revLimiterRPM
+  engine.revLimiterCutTime = tonumber(config.revLimiterCutTime) or engine.revLimiterCutTime
+  engine.idleRPM = tonumber(config.idleRPM) or engine.idleRPM
+
+  -- Automatic shift hints (used by some gearboxes)
+  engine.highShiftUp = tonumber(config.highShiftUp) or engine.highShiftUp
+  engine.highShiftDown = tonumber(config.highShiftDown) or engine.highShiftDown
 end
 
 local function init(jbeamData)
@@ -84,20 +108,8 @@ local function init(jbeamData)
   baseTorqueCurve = copyCurve(engine.torqueCurve)
 
   -- Load configuration from jbeamData
-  if jbeamData then
-    config.powerCoef = tonumber(jbeamData.powerCoef) or config.powerCoef
-    config.indestructible = jbeamData.indestructible or config.indestructible
-    config.engineBrakeTorque = tonumber(jbeamData.engineBrakeTorque) or config.engineBrakeTorque
-    config.cylinderWallDamageThreshold = tonumber(jbeamData.cylinderWallDamageThreshold) or config.cylinderWallDamageThreshold
-    config.headGasketDamageThreshold = tonumber(jbeamData.headGasketDamageThreshold) or config.headGasketDamageThreshold
-    config.pistonRingDamageThreshold = tonumber(jbeamData.pistonRingDamageThreshold) or config.pistonRingDamageThreshold
-    config.connectingRodDamageThreshold = tonumber(jbeamData.connectingRodDamageThreshold) or config.connectingRodDamageThreshold
-    config.maxTorqueRating = tonumber(jbeamData.maxTorqueRating) or config.maxTorqueRating
-    config.maxOverTorqueDamage = tonumber(jbeamData.maxOverTorqueDamage) or config.maxOverTorqueDamage
-  end
+  reset(jbeamData)
 
-  applyPowerCoef()
-  applyEngineConfig()
 end
 
 local function reset(jbeamData)
@@ -105,7 +117,11 @@ local function reset(jbeamData)
     config.powerCoef = tonumber(jbeamData.powerCoef) or config.powerCoef or 1
     config.indestructible = jbeamData.indestructible or config.indestructible
     config.engineBrakeTorque = tonumber(jbeamData.engineBrakeTorque) or config.engineBrakeTorque
-    config.maxRPM = tonumber(jbeamData.maxRPM) or config.maxRPM
+    config.revLimiterRPM = tonumber(jbeamData.maxRPM or jbeamData.revLimiterRPM) or config.revLimiterRPM
+    config.revLimiterCutTime = tonumber(jbeamData.revLimiterCutTime or jbeamData.cutTime) or config.revLimiterCutTime
+    config.idleRPM = tonumber(jbeamData.idleRPM) or config.idleRPM
+    config.highShiftUp = tonumber(jbeamData.highShiftUp) or config.highShiftUp
+    config.highShiftDown = tonumber(jbeamData.highShiftDown) or config.highShiftDown
     config.headGasketDamageThreshold = tonumber(jbeamData.headGasketDamageThreshold) or config.headGasketDamageThreshold
     config.pistonRingDamageThreshold = tonumber(jbeamData.pistonRingDamageThreshold) or config.pistonRingDamageThreshold
     config.connectingRodDamageThreshold = tonumber(jbeamData.connectingRodDamageThreshold) or config.connectingRodDamageThreshold

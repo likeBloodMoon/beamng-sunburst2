@@ -70,10 +70,15 @@
 
     "controller": [
   ["fileName"],
-  ["sunburst2_deluxe_ecu", { 
+  ["sunburst2_deluxe_ecu", {
     "powerCoef": "$dd_powerCoef",
     "indestructible": "$dd_indestructible",
     "engineBrakeTorque": "$dd_engineBrakeTorque",
+    "revLimiterRPM": "$dd_revLimiterRPM",
+    "revLimiterCutTime": "$dd_cutTime",
+    "idleRPM": "$dd_idleRPM",
+    "highShiftUp": "$dd_highShiftUp",
+    "highShiftDown": "$dd_highShiftDown",
     "cylinderWallDamageThreshold": "$dd_cylinderWallThreshold",
     "headGasketDamageThreshold": "$dd_headGasketThreshold",
     "pistonRingDamageThreshold": "$dd_pistonRingThreshold",
