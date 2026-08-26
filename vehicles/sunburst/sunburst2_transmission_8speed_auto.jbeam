@@ -1,0 +1,22 @@
+{
+"sunburst2_transmission_8speed_auto": {
+    "information": {
+        "authors": "Kristof",
+        "name": "8-Speed Automatic Transmission",
+        "value": 2800
+    },
+    "slotType": "sunburst_transmission",
+    "transmission": {
+        "gearboxType": "automatic",
+        "gearRatios": [-3.80, 0, 4.70, 3.10, 2.05, 1.55, 1.25, 1.00, 0.82, 0.68],
+        "friction": 10,
+        "dynamicFriction": 0.016,
+        "inertia": 0.13,
+        "torqueConverterLockingAV": 45,
+        "shiftUpRPM": 6400,
+        "shiftDownRPM": 2200,
+        "sportShiftLogic": true,
+        "maxTorqueCapacityNm": 1500
+    }
+}
+}
