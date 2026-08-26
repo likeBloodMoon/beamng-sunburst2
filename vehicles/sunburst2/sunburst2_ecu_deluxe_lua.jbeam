@@ -1,0 +1,43 @@
+{
+"sunburst2_ecu_deluxe_lua": {
+    "information": {
+        "authors": "Kristof",
+        "name": "Deluxe Lua ECU",
+        "value": 4200
+    },
+    "slotType": ["sunburst2_engine_1_6_ecu", "sunburst2_engine_2_0_ecu", "sunburst2_engine_2_5_ecu"],
+    "variables": [
+        ["name", "type", "unit", "category", "default", "min", "max", "title", "description"],
+        ["$ecuPowerMultiplier", "range", "x", "Deluxe ECU", 1.0, 0.2, 5.0, "Power Multiplier", "Scales the whole torque curve at runtime, whatever engine is fitted", {"stepDis":0.1}],
+        ["$revLimiterRPM", "range", "rpm", "Deluxe ECU", 7200, 4500, 9500, "Rev Limiter RPM", "RPM where the rev limiter prevents further revving", {"stepDis":50}],
+        ["$revLimiterCutTime", "range", "s", "Deluxe ECU", 0.08, 0.01, 0.5, "Rev Limiter Cut Time", "How fast the rev limiter cycles", {"stepDis":0.01}],
+        ["$wastegateTarget", "range", "psi", "Deluxe ECU", 20, 5, 30, "Wastegate Target Pressure", "Target pressure at which the wastegate begins to open (only relevant with a turbo fitted)", {"stepDis":0.5}]
+    ],
+    "controller": [
+        ["fileName", "type"],
+        ["sunburstDeluxeECU", "auxiliary"]
+    ],
+    "sunburstDeluxeECU": {
+        "powerMultiplier": "$ecuPowerMultiplier",
+        "indestructible": false,
+        "bigBlockRemap": false
+    },
+    "mainEngine": {
+        "idleRPM": 900,
+        "revLimiterRPM": "$revLimiterRPM",
+        "revLimiterType": "timeBased",
+        "revLimiterCutTime": "$revLimiterCutTime",
+        "instantAfterFireVolumeCoef": 1.0,
+        "sustainedAfterFireVolumeCoef": 0.6,
+        "shiftAfterFireVolumeCoef": 0.9,
+
+        "cylinderWallTemperatureDamageThreshold": 150,
+        "engineBlockTemperatureDamageThreshold": 140,
+        "headGasketDamageThreshold": 260000,
+        "pistonRingDamageThreshold": 1150000,
+        "connectingRodDamageThreshold": 1900000,
+        "maxTorqueRating": 420,
+        "maxOverTorqueDamage": 600
+    }
+}
+}

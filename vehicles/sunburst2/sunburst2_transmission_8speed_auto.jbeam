@@ -1,0 +1,79 @@
+{
+"sunburst2_transmission_8speed_auto": {
+    "information": {
+        "authors": "Kristof",
+        "name": "8-Speed Automatic Transmission",
+        "value": 9200
+    },
+    "slotType": "sunburst2_transaxle",
+    "slots2": [
+        ["name", "allowTypes", "denyTypes", "default", "description"],
+        ["sunburst2_transfer_case", ["sunburst2_transfer_case"], [], "sunburst2_transfer_case_FWD", "Transfer Case"],
+        ["sunburst2_differential_F", ["sunburst2_differential_F"], [], "sunburst2_differential_F", "Front Differential"]
+    ],
+    "powertrain": [
+        ["type", "name", "inputName", "inputIndex"],
+        ["torqueConverter", "torqueConverter", "mainEngine", 1],
+        ["cvtGearbox", "gearbox", "torqueConverter", 1]
+    ],
+    "torqueConverter": {
+        "uiName": "Torque Converter",
+        "converterDiameter": 0.26,
+        "converterStiffness": 7,
+        "couplingAVRatio": 0.92,
+        "stallTorqueRatio": 2.10,
+        "additionalEngineInertia": 0.14
+    },
+    "gearbox": {
+        "uiName": "Gearbox",
+        "minGearRatio": 0.62,
+        "maxGearRatio": 4.70,
+        "friction": 1.05,
+        "dynamicFriction": 0.00105,
+        "torqueLossCoef": 0.019,
+        "oneWayViscousCoef": 30,
+        "parkLockTorque": 2600,
+        "gearboxNode:": ["tra1"]
+    },
+    "vehicleController": {
+        "shiftLogicName": "cvtGearbox2",
+        "automaticModes": "PRNDS",
+        "aggressionSmoothingDown": 0.4,
+        "aggressionHoldOffThrottleDelay": 1.75,
+        "cvtGearRatioSmoothingIn": 8,
+        "cvtGearRatioSmoothingOut": 6,
+        "cvtTargetRPMMap": [
+            [0, 50],
+            [0, 850, 1300],
+            [0.33, 2000, 2200],
+            [0.67, 2600, 2600],
+            [1, 6900, 6900]
+        ],
+        "cvtSportGearRatios": [4.70, 3.10, 2.05, 1.55, 1.25, 1.00, 0.82, 0.68]
+    },
+    "flexbodies": [
+        ["mesh", "[group]:", "nonFlexMaterials"],
+        ["sunburst2_transmission", ["sunburst2_engine", "sunburst2_transaxle"]]
+    ],
+    "nodes": [
+        ["id", "posX", "posY", "posZ"],
+        {"frictionCoef": 0.5},
+        {"nodeMaterial": "|NM_METAL"},
+        {"selfCollision": false},
+        {"collision": true},
+        {"group": "sunburst2_transaxle"},
+        {"nodeWeight": 32},
+        ["tra1", 0.000, -0.750, 0.335],
+        {"group": ""}
+    ],
+    "beams": [
+        ["id1:", "id2:"],
+        {"beamPrecompression": 1, "beamType": "|NORMAL", "beamLongBound": 1.0, "beamShortBound": 1.0},
+        {"beamSpring": 15001000, "beamDamp": 500},
+        {"beamDeform": 175000, "beamStrength": "FLT_MAX"},
+        ["tra1", "e2r"], ["tra1", "e4r"], ["tra1", "e2l"], ["tra1", "e4l"],
+        ["tra1", "e1r"], ["tra1", "e3r"], ["tra1", "e1l"], ["tra1", "e3l"],
+        {"beamPrecompression": 1, "beamType": "|NORMAL", "beamLongBound": 1.0, "beamShortBound": 1.0}
+    ]
+}
+}

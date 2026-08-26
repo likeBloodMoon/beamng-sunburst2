@@ -1,6 +1,6 @@
 {
   "name": "Sunburst2 Deluxe ECU (Lua Power)",
-  "version": "2.0",
+  "version": "3.0",
   "author": "Kristof",
-  "description": "Deluxe ECU for the Sunburst with a Lua-based power multiplier, custom idle/rev-limiter, soft-damage simulation with toggleable indestructible mode, three VGT turbo tunes, three transmission options (15-speed manual, 6-speed sequential, 8-speed auto), and an optional big-block 6.2L torque-curve remap."
+  "description": "Deluxe ECU for the Hirochi Sunburst's 2.5L F4, built against the real stock jbeam: a Lua power multiplier, native rev-limiter/idle/damage tuning, an indestructible toggle, three VGT turbo stages with real turbo geometry, three real transaxle options (15-speed manual, 6-speed sequential, 8-speed auto), an optional big-block 6.2L torque-curve remap, an in-game tuning app, and backfire/BOV sound hooks."
 }
