@@ -1,0 +1,44 @@
+name: Validate mod files
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lua
+        run: sudo apt-get update && sudo apt-get install -y lua5.3
+
+      - name: Validate .jbeam files as JSON
+        run: |
+          set -e
+          fail=0
+          shopt -s globstar nullglob
+          for f in vehicles/**/*.jbeam; do
+            if ! python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; then
+              echo "::error file=$f::Invalid JSON"
+              fail=1
+            else
+              echo "OK: $f"
+            fi
+          done
+          exit $fail
+
+      - name: Validate .lua syntax
+        run: |
+          set -e
+          fail=0
+          shopt -s globstar nullglob
+          for f in lua/**/*.lua; do
+            if ! luac5.3 -p "$f"; then
+              echo "::error file=$f::Lua syntax error"
+              fail=1
+            else
+              echo "OK: $f"
+            fi
+          done
+          exit $fail

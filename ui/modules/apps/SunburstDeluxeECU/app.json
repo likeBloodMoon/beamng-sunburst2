@@ -1,0 +1,9 @@
+{
+    "name": "SunburstDeluxeECU",
+    "js": "app.js",
+    "css": "app.css",
+    "bgTransparent": true,
+    "size": {"x": 260, "y": 340},
+    "author": "Kristof",
+    "activity": "State.Driving"
+}

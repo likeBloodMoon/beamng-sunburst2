@@ -17,6 +17,20 @@ local boostSmoothed = 0
 local prevThrottle = 0
 local transientTimer = 0
 
+-- Best-effort blow-off valve hiss on lift-off under boost. Stock sample/event
+-- names aren't verifiable without a running BeamNG install, so this is
+-- pcall-guarded; sunburstVgtBovPulse is published either way for a
+-- soundConfig to drive its own sample off of.
+local function tryPlayBov()
+  electrics.values.sunburstVgtBovPulse = 1
+  pcall(function()
+    if sounds and sounds.playSoundOnceFollowing then
+      local nodeID = (engine and engine.engineNodeID) or 0
+      sounds.playSoundOnceFollowing("event:>Vehicle>Turbo>blowoff_high", nodeID, 1)
+    end
+  end)
+end
+
 local function smoothstep(edge0, edge1, x)
   if edge1 == edge0 then return x < edge0 and 0 or 1 end
   local t = math.max(0, math.min(1, (x - edge0) / (edge1 - edge0)))
@@ -57,6 +71,13 @@ local function updateGFX(dt)
   if throttleDelta > 0.25 and rpm > (params.transitionRPM or 3500) * 0.5 then
     transientTimer = params.transientDecaySec or 0.6
   end
+
+  -- blow-off valve hiss on a hard lift while meaningfully spooled/boosted
+  electrics.values.sunburstVgtBovPulse = 0
+  if throttleDelta < -0.35 and boostSmoothed > 0.3 then
+    tryPlayBov()
+  end
+
   prevThrottle = throttle
 
   local transientMult = 1

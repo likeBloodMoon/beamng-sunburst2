@@ -27,6 +27,23 @@ local damage = {
 local revLimiterCutTimer = 0
 local damagePenalty = 1
 
+-- Best-effort backfire pop. Stock sample/event names vary by game version and
+-- aren't verifiable without a running BeamNG install, so this is wrapped in
+-- pcall and never allowed to break the controller if it fails; electrics are
+-- always published either way so a soundConfig can drive its own sample off
+-- of them instead.
+local function tryPlayPop(volume)
+  electrics.values.sunburstBackfirePulse = 1
+  if engine then
+    pcall(function()
+      local nodeID = engine.engineNodeID or 0
+      if sounds and sounds.playSoundOnceFollowing then
+        sounds.playSoundOnceFollowing("event:>Vehicle>Backfire>machine_gun_backfire", nodeID, volume or 1)
+      end
+    end)
+  end
+end
+
 local bigBlockCurvePoints = {
   {rpm = 800, torque = 350},
   {rpm = 1500, torque = 480},
@@ -116,6 +133,7 @@ local function applyRevLimiter(dt, rpm)
 
   if rpm >= params.revLimiterRPM then
     revLimiterCutTimer = (params.revLimiterCutTimeMs or 60) / 1000
+    tryPlayPop(1)
   end
 end
 
@@ -177,6 +195,7 @@ local function updateDamage(dt, rpm, load, boost)
   if total > 85 and engine and engine.ignitionCoef ~= nil and revLimiterCutTimer <= 0 then
     if math.random() < (total - 85) / 100 then
       engine.ignitionCoef = 0.4
+      tryPlayPop(0.6)
     end
   end
 end
@@ -194,6 +213,8 @@ local function updateGFX(dt)
   local rpm = (electrics.values and electrics.values.rpm) or 0
   local load = (electrics.values and electrics.values.engineLoad) or 0
   local boost = (electrics.values and electrics.values.boost) or 0
+
+  electrics.values.sunburstBackfirePulse = 0
 
   applyIdleRPM()
   applyRevLimiter(dt, rpm)
