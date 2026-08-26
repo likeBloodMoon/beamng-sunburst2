@@ -15,10 +15,8 @@ angular.module('beamng.apps')
       '<div class="sunburst-ecu-app">' +
         '<div class="title">Sunburst2 Deluxe ECU</div>' +
         '<div class="row"><span>RPM</span><span>{{rpm | number:0}}</span></div>' +
-        '<div class="row"><span>Damage</span><span>{{damage | number:0}}%</span></div>' +
-        '<div class="row"><span>Turbo Boost x</span><span>{{turboBoost | number:2}}</span></div>' +
-        '<div class="row"><span>Turbo Spool</span><span>{{spoolPct | number:0}}%</span></div>' +
-        '<div class="row"><span>Vane Angle</span><span>{{vaneAngle | number:0}}°</span></div>' +
+        '<div class="row"><span>Boost</span><span>{{boost | number:1}} psi</span></div>' +
+        '<div class="row"><span>Status</span><span>{{indestructible ? "Indestructible" : "Normal"}}</span></div>' +
         '<hr/>' +
         '<div class="row"><span>Power Multiplier</span><span>x{{powerMult | number:1}}</span></div>' +
         '<input type="range" min="0.2" max="5" step="0.1" ng-model="powerMult" ng-change="applyPowerMult()"/>' +
@@ -33,10 +31,7 @@ angular.module('beamng.apps')
     restrict: 'EA',
     link: function (scope) {
       scope.rpm = 0
-      scope.damage = 0
-      scope.turboBoost = 1
-      scope.spoolPct = 0
-      scope.vaneAngle = 0
+      scope.boost = 0
       scope.powerMult = 1
       scope.indestructible = false
       scope.bigBlock = false
@@ -48,10 +43,8 @@ angular.module('beamng.apps')
         if (!streams || !streams.electrics) return
         var e = streams.electrics
         scope.rpm = e.rpm || 0
-        scope.damage = e.sunburstEcuDamage || 0
-        scope.turboBoost = (e.sunburstTurboBoostMult != null) ? e.sunburstTurboBoostMult : 1
-        scope.spoolPct = (e.sunburstTurboSpool || 0) * 100
-        scope.vaneAngle = e.sunburstVgtVaneAngle || 0
+        scope.boost = e.boost || 0
+        scope.indestructible = !!e.sunburstEcuIndestructible
       })
 
       function callEcu(method, arg) {

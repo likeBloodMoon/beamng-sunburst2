@@ -1,0 +1,81 @@
+{
+"sunburst2_transmission_6speed_sequential": {
+    "information": {
+        "authors": "Kristof",
+        "name": "6-Speed Sequential Transmission",
+        "value": 8600
+    },
+    "slotType": "sunburst2_transaxle",
+    "slots2": [
+        ["name", "allowTypes", "denyTypes", "default", "description"],
+        ["sunburst2_flywheel", ["sunburst2_flywheel"], [], "sunburst2_flywheel_race", "Flywheel", {"coreSlot":true}],
+        ["sunburst2_transfer_case", ["sunburst2_transfer_case"], [], "sunburst2_transfer_case_FWD", "Transfer Case"],
+        ["sunburst2_differential_F", ["sunburst2_differential_F"], [], "sunburst2_differential_F", "Front Differential"]
+    ],
+    "variables": [
+        ["name", "type", "unit", "category", "default", "min", "max", "title", "description"],
+        ["$gear_R", "range", ":1", "Transmission", 3.45, 0.5, 5, "Reverse Gear Ratio", "Torque multiplication ratio", {"stepDis":0.01}],
+        ["$gear_1", "range", ":1", "Transmission", 3.45, 0.5, 5, "1st Gear Ratio", "Torque multiplication ratio", {"stepDis":0.01}],
+        ["$gear_2", "range", ":1", "Transmission", 2.35, 0.5, 5, "2nd Gear Ratio", "Torque multiplication ratio", {"stepDis":0.01}],
+        ["$gear_3", "range", ":1", "Transmission", 1.75, 0.5, 5, "3rd Gear Ratio", "Torque multiplication ratio", {"stepDis":0.01}],
+        ["$gear_4", "range", ":1", "Transmission", 1.35, 0.5, 5, "4th Gear Ratio", "Torque multiplication ratio", {"stepDis":0.01}],
+        ["$gear_5", "range", ":1", "Transmission", 1.05, 0.5, 5, "5th Gear Ratio", "Torque multiplication ratio", {"stepDis":0.01}],
+        ["$gear_6", "range", ":1", "Transmission", 0.82, 0.5, 5, "6th Gear Ratio", "Torque multiplication ratio", {"stepDis":0.01}]
+    ],
+    "powertrain": [
+        ["type", "name", "inputName", "inputIndex"],
+        ["frictionClutch", "clutch", "mainEngine", 1],
+        ["sequentialGearbox", "gearbox", "clutch", 1]
+    ],
+    "gearbox": {
+        "uiName": "Gearbox",
+        "gearRatios": ["$=-$gear_R", 0, "$gear_1", "$gear_2", "$gear_3", "$gear_4", "$gear_5", "$gear_6"],
+        "friction": 1.24,
+        "dynamicFriction": 0.00124,
+        "torqueLossCoef": 0.013,
+        "gearboxNode:": ["tra1"],
+
+        "gearWhineCoefsInput": [0.60, 0.00, 0.20, 0.20, 0.20, 0.20, 0.20, 0.20, 0.20, 0.20],
+        "gearWhineCoefsOutput": [0.00, 0.00, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27, 0.27],
+        "gearWhineInputEvent": "event:>Vehicle>Transmission>straight_01>twine_in_racegt3",
+        "gearWhineOutputEvent": "event:>Vehicle>Transmission>straight_01>twine_out_racegt3"
+    },
+    "clutch": {
+        "clutchFreePlay": 0.75,
+        "lockSpringCoef": 0.25
+    },
+    "vehicleController": {
+        "calculateOptimalLoadShiftPoints": true,
+        "shiftDownRPMOffsetCoef": 1.13,
+        "aggressionHoldOffThrottleDelay": 3,
+        "lowShiftDownRPM": [0, 0, 0, 2000, 2300, 2300, 2300, 2300],
+        "lowShiftUpRPM": [0, 0, 4100, 4000, 3850, 3900, 3700],
+        "clutchLaunchStartRPM": 3500,
+        "clutchLaunchTargetRPM": 4000
+    },
+    "flexbodies": [
+        ["mesh", "[group]:", "nonFlexMaterials"],
+        ["sunburst2_transmission", ["sunburst2_engine", "sunburst2_transaxle"]]
+    ],
+    "nodes": [
+        ["id", "posX", "posY", "posZ"],
+        {"frictionCoef": 0.5},
+        {"nodeMaterial": "|NM_METAL"},
+        {"selfCollision": false},
+        {"collision": true},
+        {"group": "sunburst2_transaxle"},
+        {"nodeWeight": 28},
+        ["tra1", 0.000, -0.750, 0.335],
+        {"group": ""}
+    ],
+    "beams": [
+        ["id1:", "id2:"],
+        {"beamPrecompression": 1, "beamType": "|NORMAL", "beamLongBound": 1.0, "beamShortBound": 1.0},
+        {"beamSpring": 15001000, "beamDamp": 500},
+        {"beamDeform": 175000, "beamStrength": "FLT_MAX"},
+        ["tra1", "e2r"], ["tra1", "e4r"], ["tra1", "e2l"], ["tra1", "e4l"],
+        ["tra1", "e1r"], ["tra1", "e3r"], ["tra1", "e1l"], ["tra1", "e3l"],
+        {"beamPrecompression": 1, "beamType": "|NORMAL", "beamLongBound": 1.0, "beamShortBound": 1.0}
+    ]
+}
+}

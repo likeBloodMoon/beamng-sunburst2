@@ -1,13 +1,12 @@
 -- Sunburst2 Deluxe Lua ECU
--- Auxiliary vehicle controller: power multiplier, custom idle/rev-limiter,
--- soft-damage simulation with toggleable "indestructible" mode, and an
--- optional big-block torque-curve remap.
---
--- All reads from the engine device are defensive (existence-checked / pcall
--- guarded) because private field names on the combustion engine device can
--- change between game versions -- if a hook isn't present on the running
--- version, that one integration is skipped instead of erroring the whole
--- controller.
+-- Auxiliary vehicle controller: runtime power multiplier and an
+-- indestructible-mode toggle that overrides the engine's native damage
+-- thresholds. Idle RPM and the rev limiter are handled natively by the
+-- combustion engine device via jbeam (idleRPM/revLimiterRPM/revLimiterType/
+-- revLimiterCutTime on sunburst2_ecu_deluxe_lua.jbeam) -- BeamNG's stock
+-- engine model already does that correctly, so this controller only adds
+-- what genuinely needs Lua: a multiplier that has to apply uniformly no
+-- matter which engine is equipped, and a live damage-threshold override.
 
 local M = {}
 M.type = "auxiliary"
@@ -15,34 +14,20 @@ M.relevantDevice = nil
 
 local engine = nil
 local baseTorqueCurve = nil
+local baseDamageFields = nil
 local params = {}
 
-local damage = {
-  cylinderWall = 0,
-  headGasket = 0,
-  pistonRings = 0,
-  rods = 0,
+-- native combustion engine damage fields; see documentation.beamng.com
+-- "JBeam file sections" -> mainEngine for the authoritative list
+local damageFieldNames = {
+  "cylinderWallTemperatureDamageThreshold",
+  "engineBlockTemperatureDamageThreshold",
+  "headGasketDamageThreshold",
+  "pistonRingDamageThreshold",
+  "connectingRodDamageThreshold",
+  "maxTorqueRating",
+  "maxOverTorqueDamage",
 }
-
-local revLimiterCutTimer = 0
-local damagePenalty = 1
-
--- Best-effort backfire pop. Stock sample/event names vary by game version and
--- aren't verifiable without a running BeamNG install, so this is wrapped in
--- pcall and never allowed to break the controller if it fails; electrics are
--- always published either way so a soundConfig can drive its own sample off
--- of them instead.
-local function tryPlayPop(volume)
-  electrics.values.sunburstBackfirePulse = 1
-  if engine then
-    pcall(function()
-      local nodeID = engine.engineNodeID or 0
-      if sounds and sounds.playSoundOnceFollowing then
-        sounds.playSoundOnceFollowing("event:>Vehicle>Backfire>machine_gun_backfire", nodeID, volume or 1)
-      end
-    end)
-  end
-end
 
 local bigBlockCurvePoints = {
   {rpm = 800, torque = 350},
@@ -70,7 +55,7 @@ local function interpolateBigBlock(rpm)
   return pts[#pts].torque
 end
 
-local function snapshotTorqueCurve()
+local function snapshotEngineState()
   baseTorqueCurve = nil
   if engine and type(engine.torqueCurve) == "table" then
     baseTorqueCurve = {}
@@ -80,13 +65,21 @@ local function snapshotTorqueCurve()
       end
     end
   end
+
+  baseDamageFields = {}
+  if engine then
+    for _, name in ipairs(damageFieldNames) do
+      if type(engine[name]) == "number" then
+        baseDamageFields[name] = engine[name]
+      end
+    end
+  end
 end
 
 local function rebuildTorqueCurve()
   if not (engine and baseTorqueCurve and type(engine.torqueCurve) == "table") then return end
 
-  local mult = (params.powerMultiplier or 1) * damagePenalty
-  local limitNm = params.torqueLimitNm
+  local mult = params.powerMultiplier or 1
 
   for k, base in pairs(baseTorqueCurve) do
     local value = base * mult
@@ -96,130 +89,72 @@ local function rebuildTorqueCurve()
       value = interpolateBigBlock(k) * mult
     end
 
-    if limitNm and limitNm > 0 and value > limitNm then
-      value = limitNm
-    end
-
     engine.torqueCurve[k] = value
   end
 end
 
-local function applyIdleRPM()
+local function applyIndestructible()
   if not engine then return end
-  local idle = params.idleRPM
-  if not idle or idle <= 0 then return end
-  if engine.idleRPM ~= nil then
-    engine.idleRPM = idle
-  end
-  if engine.idleAV ~= nil and engine.rpmToAV ~= nil then
-    engine.idleAV = idle * engine.rpmToAV
-  end
-end
 
-local function applyRevLimiter(dt, rpm)
-  if not (engine and params.revLimiterRPM) then return end
-
-  if revLimiterCutTimer > 0 then
-    revLimiterCutTimer = revLimiterCutTimer - dt
-    if engine.ignitionCoef ~= nil then
-      engine.ignitionCoef = 0
-    end
-    return
-  end
-
-  if engine.ignitionCoef ~= nil then
-    engine.ignitionCoef = 1
-  end
-
-  if rpm >= params.revLimiterRPM then
-    revLimiterCutTimer = (params.revLimiterCutTimeMs or 60) / 1000
-    tryPlayPop(1)
-  end
-end
-
-local function updateDamage(dt, rpm, load, boost)
   if params.indestructible then
-    damage.cylinderWall = 0
-    damage.headGasket = 0
-    damage.pistonRings = 0
-    damage.rods = 0
-    damagePenalty = 1
-    electrics.values.sunburstEcuDamage = 0
-    return
+    pcall(function()
+      engine.cylinderWallTemperatureDamageThreshold = 99999
+      engine.engineBlockTemperatureDamageThreshold = 99999
+      engine.headGasketDamageThreshold = 99999999
+      engine.pistonRingDamageThreshold = 99999999
+      engine.connectingRodDamageThreshold = 99999999
+      engine.maxTorqueRating = 999999
+      engine.maxOverTorqueDamage = 999999
+    end)
+  elseif baseDamageFields then
+    pcall(function()
+      for name, value in pairs(baseDamageFields) do
+        engine[name] = value
+      end
+    end)
   end
+end
 
-  local th = params.damageThresholds or {}
+-- best-effort backfire pop near the rev limiter; the actual ignition cut is
+-- handled natively by the engine device (revLimiterRPM/Type/CutTime), this
+-- is purely a sound cue layered on top
+local wasNearLimiter = false
+local function updateBackfireCue()
+  local limiterRPM = engine and engine.revLimiterRPM
+  if not (electrics.values and limiterRPM) then return end
+  local rpm = electrics.values.rpm or 0
+  local nearLimiter = rpm >= limiterRPM - 60
 
-  -- Cylinder wall stress: sustained high load
-  local cylTh = th.cylinderWallLoad or 1.0
-  if load > cylTh then
-    damage.cylinderWall = damage.cylinderWall + (load - cylTh) * dt * 4
+  electrics.values.sunburstBackfirePulse = 0
+  if nearLimiter and not wasNearLimiter then
+    electrics.values.sunburstBackfirePulse = 1
+    pcall(function()
+      if sounds and sounds.playSoundOnceFollowing then
+        local nodeID = engine.engineNodeID or 0
+        sounds.playSoundOnceFollowing("event:>Vehicle>Backfire>machine_gun_backfire", nodeID, 0.8)
+      end
+    end)
   end
-
-  -- Head gasket stress: boost pressure above threshold
-  local hgTh = th.headGasketBoost or 1.0
-  if boost and boost > hgTh then
-    damage.headGasket = damage.headGasket + (boost - hgTh) * dt * 3
-  end
-
-  -- Piston ring wear: sustained high RPM
-  local ringTh = th.pistonRingRPM or 1.0
-  local maxRPM = (engine and engine.maxRPM) or 7000
-  if rpm > maxRPM * ringTh * 0.92 then
-    damage.pistonRings = damage.pistonRings + dt * 2
-  end
-
-  -- Rod stress: rapid load spikes at high RPM (approximated via load*rpm ratio)
-  local rodTh = th.rodTorqueSpike or 1.0
-  local rodStress = (load * (rpm / math.max(maxRPM, 1))) / rodTh
-  if rodStress > 1 then
-    damage.rods = damage.rods + (rodStress - 1) * dt * 5
-  end
-
-  damage.cylinderWall = math.min(damage.cylinderWall, 100)
-  damage.headGasket = math.min(damage.headGasket, 100)
-  damage.pistonRings = math.min(damage.pistonRings, 100)
-  damage.rods = math.min(damage.rods, 100)
-
-  local total = math.max(damage.cylinderWall, damage.headGasket, damage.pistonRings, damage.rods)
-  damagePenalty = 1 - (total / 100) * 0.6
-  if damagePenalty < 0.25 then damagePenalty = 0.25 end
-
-  electrics.values.sunburstEcuDamage = total
-  electrics.values.sunburstEcuDamageCylinderWall = damage.cylinderWall
-  electrics.values.sunburstEcuDamageHeadGasket = damage.headGasket
-  electrics.values.sunburstEcuDamagePistonRings = damage.pistonRings
-  electrics.values.sunburstEcuDamageRods = damage.rods
-
-  -- rough misfire feedback once things get bad
-  if total > 85 and engine and engine.ignitionCoef ~= nil and revLimiterCutTimer <= 0 then
-    if math.random() < (total - 85) / 100 then
-      engine.ignitionCoef = 0.4
-      tryPlayPop(0.6)
-    end
-  end
+  wasNearLimiter = nearLimiter
 end
 
 local function updateGFX(dt)
   if not engine then
     engine = powertrain.getDevice("mainEngine")
     if engine then
-      snapshotTorqueCurve()
+      snapshotEngineState()
+      rebuildTorqueCurve()
+      applyIndestructible()
     else
       return
     end
   end
 
-  local rpm = (electrics.values and electrics.values.rpm) or 0
-  local load = (electrics.values and electrics.values.engineLoad) or 0
-  local boost = (electrics.values and electrics.values.boost) or 0
+  updateBackfireCue()
 
-  electrics.values.sunburstBackfirePulse = 0
-
-  applyIdleRPM()
-  applyRevLimiter(dt, rpm)
-  updateDamage(dt, rpm, load, boost)
-  rebuildTorqueCurve()
+  if electrics.values then
+    electrics.values.sunburstEcuIndestructible = params.indestructible and 1 or 0
+  end
 end
 
 local function setPowerMultiplier(mult)
@@ -229,6 +164,7 @@ end
 
 local function setIndestructible(state)
   params.indestructible = state and true or false
+  applyIndestructible()
 end
 
 local function setBigBlockRemap(state)
@@ -239,26 +175,16 @@ end
 local function init(jbeamData)
   params = jbeamData or {}
   params.powerMultiplier = params.powerMultiplier or 1
-  params.revLimiterRPM = params.revLimiterRPM or 7200
-  params.revLimiterCutTimeMs = params.revLimiterCutTimeMs or 60
-  params.idleRPM = params.idleRPM or 900
   params.indestructible = params.indestructible or false
   params.bigBlockRemap = params.bigBlockRemap or false
-  params.torqueLimitNm = params.torqueLimitNm or 0
-  params.damageThresholds = params.damageThresholds or {}
 
   engine = powertrain.getDevice("mainEngine")
-  snapshotTorqueCurve()
+  snapshotEngineState()
 
-  damage.cylinderWall = 0
-  damage.headGasket = 0
-  damage.pistonRings = 0
-  damage.rods = 0
-  damagePenalty = 1
-  revLimiterCutTimer = 0
+  wasNearLimiter = false
 
   rebuildTorqueCurve()
-  applyIdleRPM()
+  applyIndestructible()
 end
 
 local function reset(jbeamData)
