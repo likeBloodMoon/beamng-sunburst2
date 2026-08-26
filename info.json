@@ -1,6 +1,6 @@
 {
   "name": "Sunburst2 Deluxe ECU (Lua Power)",
-  "version": "1.2",
+  "version": "2.0",
   "author": "Kristof",
-  "description": "Deluxe ECU for Sunburst2 with Lua-based power multiplier, near-indestructible durability, multiple VGT turbo kits, new 8-speed auto, and a Tonawanda-inspired 6.2L V8 swap option."
+  "description": "Deluxe ECU for the Sunburst with a Lua-based power multiplier, custom idle/rev-limiter, soft-damage simulation with toggleable indestructible mode, three VGT turbo tunes, three transmission options (15-speed manual, 6-speed sequential, 8-speed auto), and an optional big-block 6.2L torque-curve remap."
 }

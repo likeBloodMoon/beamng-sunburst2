@@ -1,0 +1,24 @@
+{
+"sunburst2_turbo_vgt_stage2": {
+    "information": {
+        "authors": "Kristof",
+        "name": "VGT Turbo - Stage 2 (Balanced)",
+        "value": 2200
+    },
+    "slotType": "sunburst_turbocharger",
+    "controller": [
+        ["fileName", "type"],
+        ["sunburstVGTTurbo", "auxiliary"]
+    ],
+    "sunburstVGTTurbo": {
+        "lowBoostMultiplier": 1.05,
+        "highBoostMultiplier": 1.65,
+        "transitionRPM": 3600,
+        "spoolTimeSec": 0.35,
+        "transientPeakMultiplier": 1.12,
+        "transientDecaySec": 0.55,
+        "vaneMinAngle": 15,
+        "vaneMaxAngle": 50
+    }
+}
+}
